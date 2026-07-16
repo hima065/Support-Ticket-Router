@@ -1,0 +1,203 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "support-ticket",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "695c3818-2a89-46e3-b284-4e1dc6e1d64c",
+      "name": "Webhook",
+      "webhookId": "f9f87ede-48d5-4d79-8fda-2d25c6bb0e1a"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "30948159-cb25-432a-839f-03494ddb96a9",
+              "leftValue": "={{ $json.body.urgency }}",
+              "rightValue": "high",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        224,
+        0
+      ],
+      "id": "2d7da9f5-b9eb-4a67-b7e5-eeb220f5ee6a",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://hooks.slack.com/services/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",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "\n{\n  \"text\": \"🚨 High Priority Ticket\\nSubject: {{$json.body.subject}}\\nMessage: {{$json.body.message}}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        448,
+        -96
+      ],
+      "id": "2a972736-9277-424c-b9d3-a206651bb71c",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1JWvZipb6OCHYK8pG5r1_G00oSNjpIUbwI5nIucnEmmI",
+          "mode": "list",
+          "cachedResultName": "Ticket",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JWvZipb6OCHYK8pG5r1_G00oSNjpIUbwI5nIucnEmmI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JWvZipb6OCHYK8pG5r1_G00oSNjpIUbwI5nIucnEmmI/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Message ": "={{ $json.body.message}}",
+            "Subject ": "={{ $json.body.subject }}",
+            "Urgency": "={{ $json.body.urgency }}",
+            "Data": "={{ $now }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Subject ",
+              "displayName": "Subject ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Message ",
+              "displayName": "Message ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Urgency",
+              "displayName": "Urgency",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Data",
+              "displayName": "Data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        448,
+        96
+      ],
+      "id": "9ccb70b1-5102-4e35-89e9-c63a086b9bca",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "2ORJuJzpgM2zL0WC",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "0ca52084-bfe6-4a19-a7ea-c827a9649796",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "01b91747584fb66d86adcaf9f0731f056e7eba532dc278b9a9263b7cfe261206"
+  },
+  "nodeGroups": [],
+  "id": "flUxqQL8HyfqLmIX",
+  "tags": []
+}
